@@ -57,7 +57,7 @@ process quantification {
 
     input:
     file idx from index
-    file read from processed_reads
+    set readID, file(readFile) from processed_reads
 
     output:
     file("read_counts/$read/quant.sf") into read_counts
