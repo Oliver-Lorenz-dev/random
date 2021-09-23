@@ -67,7 +67,7 @@ row.names(gene_lfc) = NULL
 write.csv(x=gene_lfc, file='DEGS.csv', row.names = FALSE)
 
 # MA plot
-# plotMA(dds , alpha = 0.01, main = "Test MA plot")
+plotMA(dds , alpha = 0.01, main = "Test MA plot")
 
 # PCA plot
 dds_var_transform = varianceStabilizingTransformation(deseq_data)
