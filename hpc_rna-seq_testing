@@ -20,7 +20,7 @@ run_table_10_11 = filter(run_table, p_value == '10/11')
 run_table_10_11_17_18 = full_join(run_table_10_11,run_table_17_18)
 
 # count files for tximport
-sample_ids = pull(run_table, Index)
+sample_ids = pull(run_table_10_11_17_18, Index)
 count_files = paste0('/nfs/pathogen002/ol6/RNA-seq-Chris/',sample_ids, '/quant.sf')
 
 # read in mapped transcripts file
@@ -33,7 +33,7 @@ count_data = tximport(files = count_files, type='salmon',
 
 # import data into DESeq2
 deseq_data = DESeqDataSetFromTximport(txi = count_data, colData =
-                                      run_table, design = ~p_value)
+                                      run_table_10_11_17_18, design = ~p_value)
 
 # run DESeq2 analysis on data
 dds = DESeq(deseq_data)
@@ -67,7 +67,7 @@ row.names(gene_lfc) = NULL
 write.csv(x=gene_lfc, file='DEGS.csv', row.names = FALSE)
 
 # MA plot
-plotMA(dds , alpha = 0.01, main = "Test MA plot")
+# plotMA(dds , alpha = 0.01, main = "Test MA plot")
 
 # PCA plot
 dds_var_transform = varianceStabilizingTransformation(deseq_data)
