@@ -10,8 +10,8 @@ library(tximport)
 run_table = read_csv('./demo_run_table.txt')
 
 # filter run table for values you want
-run_table_1 = filter(run_table, Condition == 'UNINDUCED')
-run_table_2 = filter(run_table, Condition == 'WT')
+run_table_1 = filter(run_table, p_value == '10/11')
+run_table_2 = filter(run_table, p_value == '17/18')
 
 run_table_final = full_join(run_table_1,run_table_2)
 
@@ -19,12 +19,11 @@ run_table_final = full_join(run_table_1,run_table_2)
 count_data = read_tsv('./salmon.merged.gene_counts.tsv')
 
 count_data = data.frame(count_data)
+names = count_data[,2]
 
+rownames(count_data) = make.names(names, unique = TRUE)
 # drop unnecessary columns and set row names to gene ids
-count_data = count_data[,-1]
-rownames(count_data) = count_data[,1]
-
-count_data_final = subset(count_data, select = -c(1))
+count_data_final = subset(count_data, select = -c(1,2))
 
 # convert values to integer
 count_data_dds <- mutate_all(count_data_final, function(x) as.integer(as.character(x)))
@@ -40,14 +39,14 @@ count_data_filter = count_data_dds[final_samples]
 
 
 deseq_data <- DESeqDataSetFromMatrix(countData = count_data_filter,
-                              colData = run_table_final,
-                              design= ~ Condition)
+                                     colData = run_table_final,
+                                     design= ~ Condition)
 
 # run DESeq2 analysis on data
 dds = DESeq(deseq_data)
 
 # get results
-dds_results = results(dds , contrast = c("Condition","WT","UNINDUCED"))
+dds_results = results(dds , contrast = c("p_value","10/11","17/18"))
 
 # check each gene for differential expression
 dds_results$dif_exp = dds_results$padj < 0.05 & abs(dds_results$log2FoldChange) > 1
@@ -58,8 +57,8 @@ dds_dif_exp_results = filter(dds_dif_exp_results, padj < 0.05)
 dds_dif_exp_results = filter(dds_dif_exp_results, abs(log2FoldChange) > 1)
 
 # MA plot
-plotMA(dds , alpha = 0.01, main = "MA plot")
+plotMA(dds , alpha = 0.01, main = "P value 10/11 v 17/18")
 
 # PCA plot
 dds_var_transform = varianceStabilizingTransformation(deseq_data)
-plotPCA(dds_var_transform , intgroup = 'Condition')
+plotPCA(dds_var_transform , intgroup = 'p_value')
