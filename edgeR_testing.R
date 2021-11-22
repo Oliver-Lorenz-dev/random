@@ -45,3 +45,12 @@ topTags(lrt)
 
 plotMD(lrt)
 abline(h=c(-1, 1), col="blue")
+
+
+# pathway analysis
+pathway_df = expression_table[ -c( 2,3) ]
+pathway_df <- tibble::rownames_to_column(pathway_df, "Gene.symbol")
+colnames(pathway_df)[colnames(pathway_df) == 'PValue'] <- 'adj.P.val'
+
+library(pathfindR)
+
